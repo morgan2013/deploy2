@@ -10,6 +10,7 @@ set :linked_dirs, %w{log tmp/pids tmp/cache public/system public/assets tmp/lett
 
 set :rvm_ruby_version, 'ruby-2.4.0@rails4'
 set :keep_releases, 5
+set :deploy_to, "/var/www/deploy2"
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
