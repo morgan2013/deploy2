@@ -10,6 +10,45 @@
 set :rails_env, 'staging'
 server '192.168.0.104', user: 'deployer', roles: %w{web app db}
 
+
+
+
+
+
+
+
+
+namespace :deploy do
+
+  task :kill_puma do
+    on roles(:web) do
+      within "#{fetch(:deploy_to)}/current/" do
+        execute "kill -9 $(cat '/var/www/deploy2/shared/tmp/pids/server.pid')" rescue nil
+      end
+    end
+  end
+
+  task :start_puma => [:set_rails_env] do
+    on roles(:web) do
+      within "#{fetch(:deploy_to)}/current/" do
+        execute :bundle, :exec, 'RAILS_ENV=staging rails s'
+      end
+    end
+  end
+
+  #cap staging deploy:invoke task=db:seed
+  task :invoke => [:set_rails_env] do
+    on roles(:web) do
+      within "#{fetch(:deploy_to)}/current/" do
+        execute :rake, "#{ENV['task']}"
+      end
+    end
+  end
+
+  after 'deploy:finishing', 'deploy:kill_puma'
+  after 'deploy:kill_puma', 'deploy:start_puma'
+end
+
 # role-based syntax
 # ==================
 
