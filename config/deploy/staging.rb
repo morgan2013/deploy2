@@ -21,17 +21,19 @@ server '192.168.0.104', user: 'deployer', roles: %w{web app db}
 namespace :deploy do
 
   task :kill_puma do
+    set :rails_env, 'staging'
     on roles(:web) do
       within "#{fetch(:deploy_to)}/current/" do
-        execute "kill -9 $(cat '/var/www/deploy2/shared/tmp/pids/server.pid')" rescue nil
+        execute "kill -9 $(cat '/var/www/deploy2/shared/tmp/pids/puma.pid')" rescue nil
       end
     end
   end
 
-  task :start_puma => [:set_rails_env] do
+  task :start_puma do
+    set :rails_env, 'staging'
     on roles(:web) do
       within "#{fetch(:deploy_to)}/current/" do
-        execute :bundle, :exec, 'RAILS_ENV=staging rails s'
+        execute :bundle, :exec, 'puma -p 3000 --pidfile tmp/pids/puma.pid'
       end
     end
   end
