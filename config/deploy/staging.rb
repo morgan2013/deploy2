@@ -34,7 +34,7 @@ namespace :deploy do
     on roles(:web) do
       within "#{fetch(:deploy_to)}/current/" do
         with rails_env: fetch(:rails_env) do
-          execute("puma -p 3000 -e staging")
+          execute :bundle, :exec, "puma -p 3000 -e staging"
         end
       end
     end
@@ -56,8 +56,8 @@ namespace :deploy do
     end
   end
 
-  #after 'deploy:finishing', 'deploy:kill_puma'
-  #after 'deploy:kill_puma', 'deploy:start_puma'
+  after 'deploy:finishing', 'deploy:kill_puma'
+  after 'deploy:kill_puma', 'deploy:start_puma'
   #after  :finishing,    :restart
 end
 
