@@ -57,4 +57,6 @@ group :development do
   gem 'capistrano-rails'
   gem 'capistrano-bundler'
   gem 'capistrano-rvm'
+  gem 'capistrano3-puma', github: "seuros/capistrano-puma"
+
 end

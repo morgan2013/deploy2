@@ -18,22 +18,24 @@ server '192.168.0.104', user: 'deployer', roles: %w{web app db}
 
 
 
-namespace :deploy do
 
+
+
+namespace :deploy do
   task :kill_puma do
-    set :rails_env, 'staging'
     on roles(:web) do
       within "#{fetch(:deploy_to)}/current/" do
-        execute "kill -9 $(cat '/var/www/deploy2/shared/tmp/pids/puma.pid')" rescue nil
+        execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
       end
     end
   end
 
-  task :start_puma do
-    set :rails_env, 'staging'
+  task :start_puma => [:set_rails_env] do
     on roles(:web) do
       within "#{fetch(:deploy_to)}/current/" do
-        execute :bundle, :exec, 'puma -p 3000 --pidfile tmp/pids/puma.pid'
+        with rails_env: fetch(:rails_env) do
+          execute("puma -p 3000 -e staging")
+        end
       end
     end
   end
@@ -47,8 +49,16 @@ namespace :deploy do
     end
   end
 
-  after 'deploy:finishing', 'deploy:kill_puma'
-  after 'deploy:kill_puma', 'deploy:start_puma'
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      invoke 'puma:restart'
+    end
+  end
+
+  #after 'deploy:finishing', 'deploy:kill_puma'
+  #after 'deploy:kill_puma', 'deploy:start_puma'
+  #after  :finishing,    :restart
 end
 
 # role-based syntax
