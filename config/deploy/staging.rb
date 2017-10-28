@@ -11,34 +11,44 @@ set :rails_env, 'staging'
 server '192.168.0.104', user: 'deployer', roles: %w{web app db}
 
 
+set :user, 'deployer'
 
 
 
 
 
 
+namespace :puma do
+  desc 'Create Directories for Puma Pids and Socket'
+  task :make_dirs do
+    on roles(:app) do
+      execute "mkdir #{shared_path}/tmp/sockets -p"
+      execute "mkdir #{shared_path}/tmp/pids -p"
+    end
+  end
 
-
+  before :start, :make_dirs
+end
 
 
 namespace :deploy do
-  task :kill_puma do
-    on roles(:web) do
-      within "#{fetch(:deploy_to)}/current/" do
-        execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
-      end
-    end
-  end
-
-  task :start_puma => [:set_rails_env] do
-    on roles(:web) do
-      within "#{fetch(:deploy_to)}/current/" do
-        with rails_env: fetch(:rails_env) do
-          execute :bundle, :exec, "puma -p 3000 -e staging"
-        end
-      end
-    end
-  end
+  # task :kill_puma do
+  #   on roles(:web) do
+  #     within "#{fetch(:deploy_to)}/current/" do
+  #       execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
+  #     end
+  #   end
+  # end
+  #
+  # task :start_puma => [:set_rails_env] do
+  #   on roles(:web) do
+  #     within "#{fetch(:deploy_to)}/current/" do
+  #       with rails_env: fetch(:rails_env) do
+  #         execute :bundle, :exec, "puma -p 3000"
+  #       end
+  #     end
+  #   end
+  # end
 
   #cap staging deploy:invoke task=db:seed
   task :invoke => [:set_rails_env] do
@@ -49,16 +59,32 @@ namespace :deploy do
     end
   end
 
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      invoke 'puma:restart'
+
+
+  desc 'Initial Deploy'
+  task :initial do
+    on roles(:web) do
+      before 'deploy:restart', 'puma:start'
+      invoke 'deploy'
     end
   end
 
-  after 'deploy:finishing', 'deploy:kill_puma'
-  after 'deploy:kill_puma', 'deploy:start_puma'
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      invoke!('puma:restart')
+    end
+  end
+
+  #after 'deploy:finishing', 'deploy:kill_puma'
+  #after 'deploy:kill_puma', 'deploy:start_puma'
   #after  :finishing,    :restart
+  #after 'deploy:finishing', 'deploy:start_puma'
+
+
+  #after  :finishing,    :cleanup
+  #after  :finishing,    :restart
+  after  :finishing,    'puma:start'
 end
 
 # role-based syntax
