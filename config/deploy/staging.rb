@@ -76,15 +76,23 @@ namespace :deploy do
     end
   end
 
-  #after 'deploy:finishing', 'deploy:kill_puma'
+  task :kill_puma do
+       on roles(:web) do
+         within "#{fetch(:deploy_to)}/current/" do
+           execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
+         end
+       end
+     end
+
+  after 'deploy:finishing', 'deploy:kill_puma'
   #after 'deploy:kill_puma', 'deploy:start_puma'
   #after  :finishing,    :restart
-  #after 'deploy:finishing', 'deploy:start_puma'
+  after 'deploy:finishing', 'puma:start'
 
 
   #after  :finishing,    :cleanup
   #after  :finishing,    :restart
-  after  :finishing,    'puma:start'
+  #after  :finishing,    'puma:start'
 end
 
 # role-based syntax
