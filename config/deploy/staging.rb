@@ -84,15 +84,14 @@ namespace :deploy do
        end
      end
 
-  after 'deploy:finishing', 'deploy:kill_puma'
+  #after 'deploy:finishing', 'deploy:kill_puma'
   #after 'deploy:kill_puma', 'deploy:start_puma'
   #after  :finishing,    :restart
-  after 'deploy:finishing', 'puma:start'
+  #after 'deploy:finishing', 'puma:start'
 
 
-  #after  :finishing,    :cleanup
-  #after  :finishing,    :restart
-  #after  :finishing,    'puma:start'
+  after  :finishing,    :cleanup
+  after  :finishing,    :restart
 end
 
 # role-based syntax
