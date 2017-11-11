@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027213349) do
+ActiveRecord::Schema.define(version: 20171029182605) do
 
-  create_table "bookmarks", force: :cascade do |t|
+  create_table "availabilities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+    t.bigint "bookmark_id"
+    t.string "days_of_week"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bookmark_id"], name: "index_availabilities_on_bookmark_id"
+  end
+
+  create_table "bookmarks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string "title"
     t.string "url"
     t.datetime "created_at", null: false

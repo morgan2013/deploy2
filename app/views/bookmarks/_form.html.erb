@@ -21,7 +21,19 @@
     <%= form.text_field :url, id: :bookmark_url %>
   </div>
 
+  <div class="field">
+    <%= form.label :availabilities %>
+
+    <%= form.fields_for :availabilities, bookmark.availabilities.build do |av| %>
+        <% 7.times.each do |i| %>
+            <%= av.check_box :days_of_week, multiple: true, name: "#{av.object_name}[days_of_week][#{i}]", id: "#{av.object_name}[days_of_week][#{i}]", label: false %>
+            <%= label_tag "#{av.object_name}[days_of_week][#{i}]".to_sym, "Day: #{i}", for: "#{av.object_name}[days_of_week][#{i}]" %>
+        <% end %>
+    <% end %>
+  </div>
+
   <div class="actions">
     <%= form.submit %>
   </div>
+
 <% end %>
