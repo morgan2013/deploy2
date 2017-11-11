@@ -51,13 +51,13 @@ namespace :deploy do
   # end
 
   #cap staging deploy:invoke task=db:seed
-  task :invoke => [:set_rails_env] do
-    on roles(:web) do
-      within "#{fetch(:deploy_to)}/current/" do
-        execute :rake, "#{ENV['task']}"
-      end
-    end
-  end
+  # task :invoke => [:set_rails_env] do
+  #   on roles(:web) do
+  #     within "#{fetch(:deploy_to)}/current/" do
+  #       execute :rake, "#{ENV['task']}"
+  #     end
+  #   end
+  # end
 
 
 
@@ -76,13 +76,13 @@ namespace :deploy do
     end
   end
 
-  task :kill_puma do
-       on roles(:web) do
-         within "#{fetch(:deploy_to)}/current/" do
-           execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
-         end
-       end
-     end
+  # task :kill_puma do
+  #      on roles(:web) do
+  #        within "#{fetch(:deploy_to)}/current/" do
+  #          execute "kill -9 $(lsof -i tcp:3000 -t)" rescue nil
+  #        end
+  #      end
+  #    end
 
   #after 'deploy:finishing', 'deploy:kill_puma'
   #after 'deploy:kill_puma', 'deploy:start_puma'
